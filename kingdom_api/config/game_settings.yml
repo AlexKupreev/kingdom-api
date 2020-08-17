@@ -1,0 +1,20 @@
+settings:
+  gold_earn: 1.0
+  gold_spent_worker: 0.5
+  gold_spent_army: 0.8
+  new_person_cost: 10
+  win_probability: 0.8
+  rob_default_probability: 0.05
+  rob_extra_probability: 0.6
+  enemy_gold: 10
+  enemy_increase: 1.2
+  enemy_decrease: 1.0
+  uncertain_gold: 0.0
+  uncertain_population: 0.0
+  uncertain_army: 0.0
+
+initials:
+  gold: 0.0
+  population: 100
+  army: 0
+  enemies: 10

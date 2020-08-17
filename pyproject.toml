@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "kingdom-api"
+version = "0.1.0"
+description = ""
+authors = ["Alexander Kupreyeu <agkupreev@gmail.com>"]
+maintainers = ["Alexander Kupreyeu <agkupreev@gmail.com>"]
+license = "MIT"
+readme = "README.rst"
+homepage = ""
+repository = ""
+documentation = ""
+keywords = ["Flask",
+            "Poetry",
+            "API",
+            "Game"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+flask = "^1.1"
+flask-restful = "^0.3"
+flask-migrate = "^2.5"
+flask-sqlalchemy = "^2.4"
+marshmallow-sqlalchemy = "^0.22"
+marshmallow = "^3.5"
+flask-marshmallow = "^0.11"
+flask-jwt-extended = "^3.24"
+passlib = "^1.7"
+python-dotenv = "^0.13"
+apispec = {extras = ["yaml"], version = "^3.3"}
+simplejson = "^3.17"
+apispec-webframeworks = "^0.5"
+celery = {extras = ["redis"], version = "^4.4"}
+gunicorn = "^20.0"
+
+[tool.poetry.dev-dependencies]
+tox = "*"
+factory_boy = "*"
+pytest = "*"
+pytest-factoryboy = "*"
+flake8 = "*"
+black = "^19.10b0"
+
+[tool.poetry.scripts]
+manage = "kingdom_api.manage:cli"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
