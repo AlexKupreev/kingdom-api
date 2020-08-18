@@ -65,20 +65,23 @@ class StateService:
 
         if StateService.is_robbing(settings, state):
             army_before = state.army
-            # FIXME
-            army_remained = StateService.calculate_army_after_battle(settings, state)
-            if army_remained < 0:
+
+            winner_flag, army_killed, enemies_killed = StateService.calculate_battle_results(
+                settings, state, StateService.random)
+            if winner_flag < 0:
                 # all gold is robbed
                 state.gold = 0.0
-                state.army = 0
                 state.notifications = f"{state.notifications}\nAll gold was robbed by enemies."
-                state.population -= army_before
-            else:
-                state.army = floor(army_remained)
-                army_killed = army_before - state.army
-                state.population -= army_killed
-                state.notifications = f"{state.notifications}\nRobbery attempt prevented by army," \
-                                      f"{army_killed} soldiers killed :(."
+
+            if winner_flag > 0:
+                state.notifications = f"{state.notifications}\nRobbery attempt prevented by army."
+
+            state.notifications = f"{state.notifications}\nArmy killed: {army_killed}." \
+                                  f"\nEnemies killed: {enemies_killed}"
+
+            state.army -= floor(army_killed)
+            state.population -= floor(army_killed)
+            state.enemies -= floor(enemies_killed)
 
         if StateService.is_game_failed(state, last_state):
             raise StateGameEndException("No money for further life.")
@@ -191,34 +194,55 @@ class StateService:
         return int(enemies) if enemies > 0 else 0
 
     @classmethod
-    def calculate_army_after_battle(cls, settings: Settings, state: State) -> int:
-        """Calculate army remained after battle with enemies.
+    def calculate_battle_results(cls, settings: Settings, state: State,
+                                 random_generator: callable) -> tuple:
+        """Calculate winner and remained armies after battle with enemies.
 
         :param settings: Settings object
         :param state: current State object
-        :return: amount of soldiers
+        :param random_generator: function that generates random variables
+        :return: tuple (winner_flag, army_killed, enemies_killed), where
+            winner_flag = 1 if user wins, -1 when enemies win, 0 when no one wins
+            army_killed - number of army units killed by enemies
+            enemies_killed - number of enemies killed by army
         """
-        army_afterwards = state.army
-        enemies_afterwards = state.enemies
+        if state.army == 0 and state.enemies == 0:
+            return 0, 0, 0
+
+        if state.army == 0:
+            return -1, 0, 0
+
+        if state.enemies == 0:
+            return 1, 0, 0
+
+        army_before = state.army
+        army_after = state.army
+        enemies_before = state.enemies
+        enemies_after = state.enemies
         # go through enemies and check if they are killed
         battle_completed = False
         while not battle_completed:
-            if enemies_afterwards <= 0:
-                battle_completed = True
+            for enemy in range(enemies_after):
+                rand_value = random_generator()
+                if rand_value < settings.win_probability:
+                    enemies_after -= 1
+                else:
+                    army_after -= 1
 
-            for enemy in range(enemies_afterwards):
-                rand_value = StateService.random()
-                if army_afterwards > 0:
-                    if rand_value < settings.win_probability:
-                        enemies_afterwards -= 1
-                    else:
-                        army_afterwards -= 1
-
-                if enemies_afterwards < 0 or army_afterwards < 0:
-                    battle_completed = True
+                if enemies_after == 0 or army_after == 0:
                     break
 
-        return army_afterwards
+            if army_after == 0 or enemies_after == 0:
+                battle_completed = True
+
+        if army_after == 0 and enemies_after == 0:
+            return 0, 0, 0
+
+        if army_after == 0:
+            return -1, army_before, enemies_before - enemies_after
+
+        # army wins
+        return 1, army_before - army_after, enemies_before
 
     @classmethod
     def is_game_failed(cls, state: State, last_state: State) -> bool:
