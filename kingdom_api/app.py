@@ -1,7 +1,9 @@
 from flask import Flask
+from flask_security import SQLAlchemySessionUserDatastore
 
-from kingdom_api import auth, api
-from kingdom_api.extensions import db, jwt, migrate, apispec, celery
+from kingdom_api import admin, api
+from kingdom_api.extensions import db, security, jwt, migrate, \
+    apispec, celery
 
 
 def create_app(testing=False, cli=False):
@@ -24,8 +26,14 @@ def create_app(testing=False, cli=False):
 def configure_extensions(app, cli):
     """configure flask extensions
     """
+    from kingdom_api.models import User, Role
+
     db.init_app(app)
-    jwt.init_app(app)
+    # TODO do we need to consume `user_datastore` in the further code?
+    user_datastore = SQLAlchemySessionUserDatastore(db.session, User, Role)
+    security.init_app(app, user_datastore)
+
+    # jwt.init_app(app)
 
     if cli is True:
         migrate.init_app(app, db)
@@ -54,7 +62,8 @@ def configure_apispec(app):
 def register_blueprints(app):
     """register all blueprints for application
     """
-    app.register_blueprint(auth.views.blueprint)
+    # app.register_blueprint(auth.views.blueprint)
+    app.register_blueprint(admin.views.blueprint)
     app.register_blueprint(api.views.blueprint)
 
 
