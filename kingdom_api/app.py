@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_security import SQLAlchemySessionUserDatastore
+from flask_wtf import CSRFProtect
 
 from kingdom_api import admin, api
 from kingdom_api.extensions import db, security, jwt, migrate, \
@@ -29,6 +30,9 @@ def configure_extensions(app, cli):
     from kingdom_api.models import User, Role
 
     db.init_app(app)
+
+    CSRFProtect(app)
+
     # TODO do we need to consume `user_datastore` in the further code?
     user_datastore = SQLAlchemySessionUserDatastore(db.session, User, Role)
     security.init_app(app, user_datastore)
