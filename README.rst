@@ -145,3 +145,18 @@ Testing and linting
     poetry run pytest
     poetry run flake8
     poetry run black .
+
+
+Roadmap
+*******
+
+* add pre-commit
+* add `authlib <https://docs.authlib.org/en/stable/>`_ for external authentication
+* add integration with `Auth0 <https://auth0.com/>`_
+* add email functionality
+* add integration with front-end
+* setup CI flow
+* fix Docker flow
+* add logging support
+* add deployment strategy (ansible playbook)
+* consider integration with other external auth services
