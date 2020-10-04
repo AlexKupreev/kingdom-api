@@ -1,6 +1,6 @@
 from flask import request
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required
+from flask_security import auth_required, permissions_accepted
 
 from kingdom_api.api.schemas import UserSchema
 from kingdom_api.models import User
@@ -77,13 +77,15 @@ class UserResource(Resource):
           description: user does not exist
     """
 
-    method_decorators = [jwt_required]
-
+    @auth_required()
+    @permissions_accepted("admin")
     def get(self, user_id):
         schema = UserSchema()
         user = User.query.get_or_404(user_id)
         return {"user": schema.dump(user)}
 
+    @auth_required()
+    @permissions_accepted("admin")
     def put(self, user_id):
         schema = UserSchema(partial=True)
         user = User.query.get_or_404(user_id)
@@ -93,6 +95,8 @@ class UserResource(Resource):
 
         return {"msg": "user updated", "user": schema.dump(user)}
 
+    @auth_required()
+    @permissions_accepted("admin")
     def delete(self, user_id):
         user = User.query.get_or_404(user_id)
         db.session.delete(user)
@@ -141,13 +145,15 @@ class UserList(Resource):
                   user: UserSchema
     """
 
-    method_decorators = [jwt_required]
-
+    @auth_required()
+    @permissions_accepted("admin")
     def get(self):
         schema = UserSchema(many=True)
         query = User.query
         return paginate(query, schema)
 
+    @auth_required()
+    @permissions_accepted("admin")
     def post(self):
         schema = UserSchema()
         user = schema.load(request.json)
