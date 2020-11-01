@@ -9,6 +9,7 @@ from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from celery import Celery
 from flask_security import Security
+from flask_admin import Admin
 
 from kingdom_api.commons.apispec import APISpecExt
 
@@ -23,3 +24,4 @@ apispec = APISpecExt()
 # TODO remove pwd_context
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 celery = Celery()
+admin_ext = Admin(template_mode='bootstrap4')

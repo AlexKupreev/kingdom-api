@@ -1,10 +1,12 @@
-from flask import Flask
+from flask import Flask, url_for
+from flask_admin.contrib.sqla import ModelView
+from flask_admin import helpers as admin_helpers
 from flask_security import SQLAlchemySessionUserDatastore
 from flask_wtf import CSRFProtect
 
 from kingdom_api import admin, api
-from kingdom_api.extensions import db, security, jwt, migrate, \
-    apispec, celery
+from kingdom_api.extensions import db, security, migrate, \
+    apispec, celery, admin_ext
 
 
 def create_app(testing=False, cli=False):
@@ -41,6 +43,9 @@ def configure_extensions(app, cli):
 
     if cli is True:
         migrate.init_app(app, db)
+    else:
+        admin_ext.init_app()
+        admin_ext.add_view(ModelView(User, db.session))
 
 
 def configure_apispec(app):
@@ -86,3 +91,17 @@ def init_celery(app=None):
 
     celery.Task = ContextTask
     return celery
+
+
+# TODO move in appropriate place
+# define a context processor for merging flask-admin's template context into the
+# flask-security views.
+@security.context_processor
+def security_context_processor():
+    return dict(
+        admin_base_template=admin_ext.base_template,
+        admin_view=admin_ext.index_view,
+        h=admin_helpers,
+        get_url=url_for
+    )
+

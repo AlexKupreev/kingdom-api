@@ -17,8 +17,12 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # automatically close idle connections.
 SQLALCHEMY_ENGINE_OPTIONS={"pool_pre_ping": True}
 
+# TODO remove
 JWT_BLACKLIST_ENABLED = True
 JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
+
+# Flask-Admin
+FLASK_ADMIN_SWATCH = 'cerulean'
 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND_URL")
